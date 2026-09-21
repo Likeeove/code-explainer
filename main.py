@@ -77,8 +77,41 @@ def explain_folder(folder_path):
                     success_count += 1
                 time.sleep(1)
 
+        # ...（前面原来的代码保持不变）
     print(f"\n🎉 批量处理完成！共发现 {total_count} 个文件，成功处理 {success_count} 个。")
+    
+    # 新增：如果成功处理了，就调用汇总函数
+    if success_count > 0:
+        merge_reports(output_dir="reports")
 
+def merge_reports(output_dir="reports"):
+    """把所有报告合并成一个文件"""
+    print("\n📚 正在汇总所有报告...")
+    all_content = "# 代码解释汇总报告\n\n"
+    
+    # 1. 获取所有 .md 文件，并按文件名排序（保证顺序）
+    report_files = [f for f in os.listdir(output_dir) if f.endswith('.md')]
+    report_files.sort()
+    
+    # 2. 循环读取每个文件的内容，拼接到一起
+    for file_name in report_files:
+        # 跳过我们自己生成的汇总文件，防止套娃
+        if file_name == "ALL_REPORTS.md":
+            continue
+            
+        file_path = os.path.join(output_dir, file_name)
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+            all_content += f"## 文件：{file_name}\n\n"
+            all_content += content + "\n\n---\n\n"
+    
+    # 3. 写入汇总文件
+    summary_path = "ALL_REPORTS.md"
+    with open(summary_path, "w", encoding="utf-8") as f:
+        f.write(all_content)
+    
+    print(f"✅ 汇总报告已生成：{summary_path}")
+    
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("💡 用法：python main.py <文件路径或文件夹路径>")
