@@ -1,30 +1,14 @@
 import sys
 import os
 import time
-from dotenv import load_dotenv
-from openai import OpenAI
+from core import analyze_code 
 
-# 加载环境变量
-load_dotenv()
 
-client = OpenAI(
-    api_key=os.getenv("DASHSCOPE_API_KEY"),
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
-)
 
 # 支持的文件后缀
 CODE_EXTENSIONS = ('.py', '.cpp', '.java', '.c', '.h', '.js', '.ts')
 
-def analyze_code(code_content, file_name):
-    """核心逻辑：调用 AI 解释代码"""
-    response = client.chat.completions.create(
-        model="qwen-turbo",
-        messages=[
-            {"role": "system", "content": "你是一个资深软件工程师，请用简洁易懂的语言解释用户提供的代码。指出它的功能、潜在的Bug以及可以优化的地方。"},
-            {"role": "user", "content": f"请解释以下代码文件 {file_name} 的内容：\n\n{code_content}"}
-        ]
-    )
-    return response.choices[0].message.content
+
 
 def explain_file(file_path, output_dir="reports"):
     """处理单个文件，并保存报告"""
